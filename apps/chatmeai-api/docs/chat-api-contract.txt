@@ -1,0 +1,123 @@
+# POST /api/v1/chat
+
+## Request
+
+**Content-Type:** `application/json`
+
+```json
+{
+  "message": "sua mensagem aqui",
+  "conversation_id": null
+}
+```
+
+| Campo             | Tipo            | Obrigatório | Descrição                              |
+|-------------------|-----------------|-------------|----------------------------------------|
+| `message`         | `string`        | Sim         | Mensagem do usuário                    |
+| `conversation_id` | `string / null` | Não         | Reservado para histórico futuro        |
+
+---
+
+## Response
+
+**Content-Type:** `text/event-stream`
+
+Cada linha do stream tem o formato:
+
+```
+data: <JSON>\n\n
+```
+
+Filtre pelo campo `type` de cada evento para rotear no client.
+
+---
+
+### Evento: `thinking`
+
+Emitido uma vez, no início do processamento.
+
+```json
+{ "type": "thinking" }
+```
+
+---
+
+### Evento: `content_delta`
+
+Fragmento de texto da resposta (token a token).
+
+```json
+{ "type": "content_delta", "delta": "string" }
+```
+
+| Campo   | Tipo     | Descrição              |
+|---------|----------|------------------------|
+| `delta` | `string` | Fragmento de texto     |
+
+---
+
+### Evento: `tool_call`
+
+Emitido quando o agente invoca uma ferramenta.
+
+```json
+{ "type": "tool_call", "tool_name": "string", "arguments": { } }
+```
+
+| Campo         | Tipo     | Descrição                             |
+|---------------|----------|---------------------------------------|
+| `tool_name`   | `string` | Nome da ferramenta invocada           |
+| `arguments`   | `object` | Argumentos passados à ferramenta      |
+
+---
+
+### Evento: `tool_result`
+
+Resultado retornado pela ferramenta.
+
+```json
+{ "type": "tool_result", "tool_name": "string", "result": "string" }
+```
+
+| Campo       | Tipo     | Descrição                        |
+|-------------|----------|----------------------------------|
+| `tool_name` | `string` | Nome da ferramenta               |
+| `result`    | `string` | Resultado retornado              |
+
+---
+
+### Evento: `done`
+
+Emitido ao final do stream.
+
+```json
+{ "type": "done", "finish_reason": "stop" }
+```
+
+| Campo           | Tipo     | Descrição           |
+|-----------------|----------|---------------------|
+| `finish_reason` | `string` | Sempre `"stop"`     |
+
+---
+
+### Evento: `error`
+
+Emitido se ocorrer uma exceção.
+
+```json
+{ "type": "error", "message": "string" }
+```
+
+| Campo     | Tipo     | Descrição            |
+|-----------|----------|----------------------|
+| `message` | `string` | Descrição do erro    |
+
+---
+
+## Fluxo típico
+
+```
+thinking → content_delta* → done
+thinking → tool_call → tool_result → content_delta* → done
+thinking → error
+```

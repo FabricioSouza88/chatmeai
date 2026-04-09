@@ -1,0 +1,100 @@
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ─── Dark theme (default) ─────────────────────────────────── */
+[data-theme='dark'] {
+  --color-bg: #212121;
+  --color-surface: #2f2f2f;
+  --color-surface-sidebar: #171717;
+  --color-border: #3f3f3f;
+  --color-text-primary: #ececec;
+  --color-text-secondary: #8e8ea0;
+  --color-accent: #10a37f;
+  --color-accent-hover: #0d8a6b;
+  --color-user-bubble: #2f2f2f;
+  --color-assistant-bubble: transparent;
+  --color-input-bg: #2f2f2f;
+  --color-code-bg: #1a1a1a;
+}
+
+/* ─── Light theme ───────────────────────────────────────────── */
+[data-theme='light'] {
+  --color-bg: #ffffff;
+  --color-surface: #f7f7f8;
+  --color-surface-sidebar: #f0f0f0;
+  --color-border: #e5e5e5;
+  --color-text-primary: #0d0d0d;
+  --color-text-secondary: #6b6b6b;
+  --color-accent: #10a37f;
+  --color-accent-hover: #0d8a6b;
+  --color-user-bubble: #e8e8ea;
+  --color-assistant-bubble: transparent;
+  --color-input-bg: #ffffff;
+  --color-code-bg: #f0f0f0;
+}
+
+/* ─── Global base ───────────────────────────────────────────── */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+/* ─── Animations ────────────────────────────────────────────── */
+@keyframes blink-cursor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes thinking-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: var(--color-text-primary);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink-cursor 1s step-end infinite;
+}
+
+.thinking-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-text-secondary);
+  animation: thinking-dot 1.4s ease-in-out infinite;
+}

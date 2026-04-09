@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(GOOGLE_OAUTH_CREDENTIALS=.credentials/google/credentials.json npx -y @cocal/google-calendar-mcp auth)",
+      "Bash(python -c \"from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver; import inspect; print\\(inspect.getsource\\(AsyncSqliteSaver.alist\\)\\)\")",
+      "Bash(pip show langgraph-checkpoint-sqlite)",
+      "Bash(python -c \"import langgraph_checkpoint_sqlite; print\\(dir\\(langgraph_checkpoint_sqlite\\)\\)\")",
+      "Bash(pip list)",
+      "Bash(python -c \"import langgraph_checkpoint; print\\(dir\\(langgraph_checkpoint\\)\\)\")",
+      "Bash(python -c \"from langgraph.checkpoint.base import BaseCheckpointSaver; print\\(''ok''\\)\")",
+      "Bash(python -c \"import langgraph.checkpoint; print\\(dir\\(langgraph.checkpoint\\)\\)\")",
+      "Bash(python -c \"from langgraph.checkpoint.memory import MemorySaver; print\\(''MemorySaver ok''\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(python -c \"import pkg_resources; dist = pkg_resources.get_distribution\\(''langgraph-checkpoint-sqlite''\\); print\\(list\\(dist.get_metadata_lines\\(''top_level.txt''\\)\\)\\)\")",
+      "Read(//c/Users/fabricio.souza/AppData/Local/Programs/Python/Python313/Lib/site-packages/**)",
+      "Bash(python -c \"from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver; print\\(''ok''\\)\")",
+      "Bash(python -c \"import langgraph; print\\(langgraph.__path__\\)\")",
+      "Bash(.venv/Scripts/pip install langgraph-checkpoint-sqlite)",
+      "Bash(\".venv/Scripts/pip.exe\" install langgraph-checkpoint-sqlite)"
+    ]
+  }
+}

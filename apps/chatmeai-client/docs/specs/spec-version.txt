@@ -1,0 +1,5 @@
+spec-0001-project-setup.md
+spec-0002-chat-ui.md
+spec-0003-vscode-setup.md
+spec-0004-conversation-memory.md
+spec-0005-user-avatar.md

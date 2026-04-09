@@ -1,0 +1,125 @@
+FRONTEND CHANGES — Conversation Memory (spec-0008)
+====================================================
+
+OVERVIEW
+--------
+The API now supports persistent conversation context. The agent will remember
+previous messages within the same session, enabling follow-up questions like:
+  - "Qual a capital da França?" → "Paris."
+  - "E qual a população dela?"  → agent knows "dela" refers to Paris.
+
+To enable this, the frontend must manage a `conversation_id` token per chat session.
+
+
+WHAT CHANGED IN THE API
+-----------------------
+1. POST /api/v1/chat — request body change
+   The `conversation_id` field is now active (previously reserved).
+
+   Before:
+     { "message": "Olá" }
+
+   After (first message of a new session):
+     { "message": "Olá", "conversation_id": null }
+
+   After (continuing an existing session):
+     { "message": "E qual a população dela?", "conversation_id": "a1b2c3d4-..." }
+
+2. New SSE event: `session_start`
+   This is now ALWAYS the first event emitted in every response stream.
+
+   Format:
+     data: {"type":"session_start","conversation_id":"a1b2c3d4-e5f6-7890-abcd-ef1234567890"}
+
+   The frontend MUST read this event and store the `conversation_id`.
+
+
+REQUIRED FRONTEND CHANGES
+--------------------------
+1. On the first message of a new conversation:
+   - Send `conversation_id: null` (or omit the field).
+   - Listen for the `session_start` SSE event.
+   - Store the received `conversation_id` in local state (e.g., React state, a ref, or sessionStorage).
+
+2. On every subsequent message in the same conversation:
+   - Send the stored `conversation_id` in the request body.
+
+3. When the user starts a NEW conversation (e.g., clicks "New Chat"):
+   - Clear the stored `conversation_id` (set it back to null).
+   - The next request will generate a fresh session.
+
+4. The `session_start` event must be handled in the SSE parser but does NOT need
+   to be displayed to the user — it is metadata only.
+
+
+EXAMPLE SSE STREAM (full sequence)
+-----------------------------------
+data: {"type":"session_start","conversation_id":"a1b2c3d4-e5f6-7890-abcd-ef1234567890"}
+
+data: {"type":"thinking"}
+
+data: {"type":"content_delta","delta":"A capital da França é "}
+
+data: {"type":"content_delta","delta":"Paris."}
+
+data: {"type":"done","finish_reason":"stop"}
+
+
+EXAMPLE — SSE PARSER UPDATE (JavaScript/TypeScript)
+----------------------------------------------------
+let conversationId = null;
+
+async function sendMessage(userMessage) {
+  const response = await fetch('/api/v1/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: userMessage,
+      conversation_id: conversationId,  // null on first message
+    }),
+  });
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n\n');
+    buffer = lines.pop(); // keep incomplete chunk
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const event = JSON.parse(line.slice(6));
+
+      if (event.type === 'session_start') {
+        conversationId = event.conversation_id; // store it!
+        continue;
+      }
+      if (event.type === 'content_delta') {
+        appendToChat(event.delta);
+      }
+      if (event.type === 'done') {
+        // stream finished
+      }
+      if (event.type === 'error') {
+        console.error(event.message);
+      }
+    }
+  }
+}
+
+// To start a new conversation:
+function resetConversation() {
+  conversationId = null;
+}
+
+
+NO CHANGES NEEDED
+-----------------
+- The SSE connection mechanism is the same (text/event-stream).
+- All existing event types (thinking, content_delta, tool_call, tool_result, done, error) are unchanged.
+- The endpoint URL is unchanged: POST /api/v1/chat

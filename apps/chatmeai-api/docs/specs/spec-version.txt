@@ -1,0 +1,12 @@
+spec-0001-setup.md
+spec-0002-routes.md
+spec-0003-config-run.md
+spec-0004-langgraph.md
+spec-0005-answer-node-refactor.md
+spec-0006-base-agent.md
+spec-0007-mcp-google-calendar.md
+spec-0008-conversation-memory.md
+spec-0009-list-conversations.md
+spec-0010-mcp-open-meteo-weather.md
+spec-0011-conversation-name.md
+spec-0012-tavily-web-search.md

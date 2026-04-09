@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "install",
+      "type": "shell",
+      "command": "uv sync",
+      "group": "build"
+    },
+    {
+      "label": "run",
+      "type": "shell",
+      "command": "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "uv run pytest tests/ -v",
+      "group": { "kind": "test", "isDefault": true }
+    },
+    {
+      "label": "lint",
+      "type": "shell",
+      "command": "uv run ruff check .",
+      "group": "build"
+    },
+    {
+      "label": "format",
+      "type": "shell",
+      "command": "uv run black .",
+      "group": "build"
+    },
+    {
+      "label": "check",
+      "type": "shell",
+      "command": "uv run ruff check . && uv run black --check .",
+      "group": "build"
+    }
+  ]
+}
